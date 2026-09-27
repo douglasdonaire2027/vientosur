@@ -1,0 +1,38 @@
+# noticiasvs
+
+[![Open in Bolt](https://bolt.new/static/open-in-bolt.svg)](https://bolt.new/~/sb1-r9sspq8m)
+
+## Configuración de Supabase
+
+La aplicación se conecta al proyecto Supabase indicado en las variables de entorno, no a la cuenta de GitHub. Para vincularla a tu propia cuenta:
+
+1. Entra a [supabase.com](https://supabase.com) con la cuenta que quieres usar.
+2. Crea un proyecto nuevo desde **New project**.
+3. En **Project Settings > API**, copia la **Project URL** y la clave pública **anon**.
+4. Copia `.env.example` como `.env` y reemplaza ambos valores.
+5. En el **SQL Editor** del proyecto nuevo, ejecuta estas migraciones en orden:
+	- `supabase/migrations/20260920002647_create_articles_table.sql`
+	- `supabase/migrations/20260920020000_add_editorial_workflow.sql`
+	- `supabase/migrations/20260920023000_add_authors.sql`
+	- `supabase/migrations/20260920024000_add_article_views.sql`
+	- `supabase/migrations/20260922000000_admin_user_management.sql`
+	- `supabase/migrations/20260923000000_fix_user_role_persistence.sql`
+	- `supabase/migrations/20260923010000_create_newsletter_subscribers.sql`
+	- `supabase/migrations/20260923020000_harden_editorial_permissions.sql`
+	- `supabase/migrations/20260923030000_newsletter_admin_tools.sql`
+
+## Envío del boletín
+
+El panel incluye un compositor para enviar boletines a suscriptores activos mediante Resend.
+
+1. Crea y verifica un dominio o remitente en [Resend](https://resend.com).
+2. Configura estos secretos en Supabase Edge Functions:
+	- `RESEND_API_KEY`
+	- `NEWSLETTER_FROM_EMAIL` (por ejemplo, `Viento Sur <boletin@tudominio.com>`)
+3. Despliega `supabase/functions/send-newsletter/index.ts` como la función `send-newsletter`.
+4. Ejecuta también la migración `supabase/migrations/20260923030000_newsletter_admin_tools.sql`.
+
+La función valida la sesión y permite enviar únicamente a administradores. Nunca coloques `RESEND_API_KEY` en `.env` del frontend.
+6. Crea el usuario editor en **Authentication > Users > Add user**.
+
+El archivo `.env` está excluido de Git y nunca debe subirse al repositorio. La conexión del repositorio GitHub se mantiene en `origin`; Supabase y GitHub son servicios separados. El botón **Open in Bolt** solo abre el proyecto en Bolt y no determina la cuenta Supabase utilizada.
